@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoleMates India - Find Your Perfect Pair</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'scale-in': 'scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-out-right': 'slideOutRight 0.4s ease-in forwards',
+                        'ken-burns': 'kenBurns 20s ease-out forwards',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(40px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.9)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        slideOutRight: {
+                            '0%': { opacity: '1', transform: 'translateX(0)' },
+                            '100%': { opacity: '0', transform: 'translateX(100%)', maxHeight: '0', margin: '0', padding: '0' },
+                        },
+                        kenBurns: {
+                            '0%': { transform: 'scale(1.1)' },
+                            '100%': { transform: 'scale(1.0)' },
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+    
+    <style>
+        body { -webkit-font-smoothing: antialiased; }
+        .page-content { animation: fadeIn 0.4s ease-out; }
+        .nav-link.active { color: #2563eb; font-weight: 600; }
+        
+        /* Smooth transitions for dark mode */
+        body, div, nav, header, section, footer, button, input, textarea {
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.3s ease,
+                        box-shadow 0.3s ease;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hover-lift:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 overflow-x-hidden relative">
+
+    <button id="scroll-top" class="fixed bottom-8 left-8 z-40 p-3 bg-blue-600 text-white rounded-full shadow-lg translate-y-20 opacity-0 transition-all duration-500 hover:bg-blue-700 hover:-translate-y-1">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
+    <div id="toast" class="fixed bottom-8 right-5 z-[60] transform translate-y-24 opacity-0 transition-all duration-500 cubic-bezier(0.16, 1, 0.3, 1)">
+        <div class="bg-gray-800 dark:bg-white text-white dark:text-gray-900 px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3 border border-gray-700 dark:border-gray-200">
+            <div class="bg-green-500 rounded-full p-1">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <span class="font-medium" id="toast-message">Item added to cart!</span>
+        </div>
+    </div>
+
+    <div id="quick-view-backdrop" class="fixed inset-0 bg-black/60 z-[70] hidden backdrop-blur-sm opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
+        <div id="quick-view-modal" class="bg-white dark:bg-gray-800 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden transform scale-90 opacity-0 transition-all duration-300 grid grid-cols-1 md:grid-cols-2">
+            <div class="h-64 md:h-auto bg-gray-100 dark:bg-gray-700 relative">
+                <img id="qv-img" src="" class="w-full h-full object-cover">
+                <div class="absolute top-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs font-bold uppercase backdrop-blur-md" id="qv-category"></div>
+            </div>
+            <div class="p-8 md:p-12 relative flex flex-col justify-center">
+                <button id="close-modal" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                
+                <h2 id="qv-title" class="text-3xl font-bold mb-2 dark:text-white"></h2>
+                <div class="flex items-center space-x-2 mb-6">
+                    <div class="flex text-yellow-400">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    </div>
+                    <span class="text-sm text-gray-500">(128 Reviews)</span>
+                </div>
+                
+                <p class="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+                    Engineered with our proprietary SoleFoam™ technology for cloud-like comfort. 
+                    Breathable mesh upper keeps your feet cool, while the durable rubber outsole ensures grip on any terrain.
+                </p>
+                
+                <div class="flex items-center justify-between mb-8">
+                    <span id="qv-price" class="text-4xl font-bold text-blue-600 dark:text-blue-400"></span>
+                    <div class="flex gap-2">
+                        <span class="w-8 h-8 rounded-full bg-black cursor-pointer ring-2 ring-offset-2 ring-transparent hover:ring-gray-400 transition"></span>
+                        <span class="w-8 h-8 rounded-full bg-blue-600 cursor-pointer ring-2 ring-offset-2 ring-transparent hover:ring-blue-400 transition"></span>
+                        <span class="w-8 h-8 rounded-full bg-gray-400 cursor-pointer ring-2 ring-offset-2 ring-transparent hover:ring-gray-300 transition"></span>
+                    </div>
+                </div>
+
+                <button id="qv-add-btn" class="w-full py-4 bg-blue-600 text-white text-lg font-bold rounded-xl shadow-lg hover:bg-blue-700 hover:-translate-y-1 transition-all duration-300">
+                    Add to Cart
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-backdrop" class="fixed inset-0 bg-black/40 z-50 hidden transition-opacity duration-500 backdrop-blur-sm opacity-0"></div>
+    
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white dark:bg-gray-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-500 cubic-bezier(0.16, 1, 0.3, 1) flex flex-col border-l border-gray-100 dark:border-gray-700">
+        
+        <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-white/50 dark:bg-gray-800/50 backdrop-blur-md">
+            <h2 class="text-2xl font-bold dark:text-white flex items-center gap-2">
+                <span>🛒</span> Your Cart
+            </h2>
+            <button id="close-cart" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-300 group">
+                <svg class="w-6 h-6 text-gray-500 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar"></div>
+
+        <div class="p-8 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 backdrop-blur-sm">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-lg font-medium text-gray-500 dark:text-gray-400">Total Amount</span>
+                <span id="cart-total" class="text-3xl font-bold text-gray-900 dark:text-white">₹0.00</span>
+            </div>
+            <button id="checkout-btn" class="w-full py-4 bg-yellow-500 text-gray-900 text-lg font-bold rounded-2xl shadow-lg shadow-yellow-500/20 hover:bg-yellow-400 hover:shadow-yellow-500/40 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2">
+                Checkout on Amazon.in
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="mobile-menu" class="fixed inset-0 bg-white dark:bg-gray-900 z-30 transform -translate-y-full transition-transform duration-500 pt-24 px-6 md:hidden">
+        <ul class="flex flex-col space-y-6 text-center">
+            <li><a href="#" class="mobile-nav-link text-2xl font-bold text-gray-800 dark:text-white" data-page="home">Home</a></li>
+            <li><a href="#" class="mobile-nav-link text-2xl font-bold text-gray-800 dark:text-white" data-page="products">Products</a></li>
+            <li><a href="#" class="mobile-nav-link text-2xl font-bold text-gray-800 dark:text-white" data-page="about">About</a></li>
+            <li><a href="#" class="mobile-nav-link text-2xl font-bold text-gray-800 dark:text-white" data-page="contact">Contact</a></li>
+        </ul>
+    </div>
+
+    <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-100 dark:border-gray-800 transition-colors duration-500">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                
+                <a href="#" class="text-2xl font-extrabold text-blue-600 dark:text-blue-400 nav-link flex items-center gap-2 tracking-tight hover:opacity-80 transition-opacity z-40" data-page="home">
+                    <span>👟 SoleMates</span>
+                </a>
+                
+                <div class="flex items-center space-x-8">
+                    <ul class="hidden md:flex space-x-8">
+                        <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-300 nav-link active relative group" data-page="home">Home<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span></a></li>
+                        <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-300 nav-link relative group" data-page="products">Products<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span></a></li>
+                        <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-300 nav-link relative group" data-page="about">About<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span></a></li>
+                        <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-300 nav-link relative group" data-page="contact">Contact<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span></a></li>
+                    </ul>
+
+                    <div class="flex items-center space-x-5 z-40">
+                        <button id="theme-toggle" class="p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 hover:rotate-12 active:scale-90">
+                            <svg id="sun-icon" class="w-5 h-5 hidden text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            <svg id="moon-icon" class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                        </button>
+
+                        <div id="cart-btn" class="relative cursor-pointer text-gray-500 hover:text-blue-600 transition duration-300 active:scale-90 group">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                            <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center transform scale-0 transition-transform duration-300 shadow-md">0</span>
+                        </div>
+
+                        <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600 dark:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="app-content">
+        <section id="page-home" class="page-content">
+            <div class="relative h-[85vh] overflow-hidden bg-gray-900 flex items-center justify-center">
+                <div class="absolute inset-0 overflow-hidden">
+                    <img src="https://images.pexels.com/photos/1478442/pexels-photo-1478442.jpeg" alt="Sneaker" class="w-full h-full object-cover opacity-60 animate-ken-burns origin-center">
+                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent"></div>
+                </div>
+                <div class="relative container mx-auto px-4 text-center z-10">
+                    <div class="max-w-4xl mx-auto">
+                        <span class="inline-block py-1 px-3 rounded-full bg-blue-600/20 text-blue-400 text-sm font-semibold mb-6 opacity-0 animate-slide-up" style="animation-delay: 0.1s">NEW COLLECTION 2026</span>
+                        <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-8 opacity-0 animate-slide-up" style="animation-delay: 0.2s">Find Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">SoleMate</span></h1>
+                        <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto opacity-0 animate-slide-up" style="animation-delay: 0.3s">Step into the future with footwear designed for the dreamers, the runners, and the movers.</p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center opacity-0 animate-slide-up" style="animation-delay: 0.4s">
+                            <button class="px-8 py-4 bg-blue-600 text-white text-lg font-bold rounded-full shadow-lg shadow-blue-600/30 hover:bg-blue-700 hover:-translate-y-1 transition-all duration-300 cta-button" data-page="products">Shop Collection</button>
+                            <button class="px-8 py-4 bg-white/10 backdrop-blur-md text-white border border-white/20 text-lg font-bold rounded-full hover:bg-white/20 hover:-translate-y-1 transition-all duration-300 cta-button" data-page="about">Our Story</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-900 relative z-20 -mt-20 rounded-t-[3rem] shadow-[0_-20px_40px_rgba(0,0,0,0.1)]">
+                <div class="container mx-auto px-4 py-24">
+                    <h2 class="text-3xl font-bold text-center mb-16 dark:text-white">Trending Now</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                        <div class="group relative rounded-2xl overflow-hidden cursor-pointer hover-lift transition-all duration-500">
+                            <img src="https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg" class="w-full h-[400px] object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute bottom-0 left-0 p-8 z-20 bg-gradient-to-t from-black/80 to-transparent w-full">
+                                <h3 class="text-2xl font-bold text-white mb-1">Urban Runner</h3>
+                                <p class="text-gray-300 text-sm">Best Seller</p>
+                            </div>
+                        </div>
+                        <div class="group relative rounded-2xl overflow-hidden cursor-pointer hover-lift transition-all duration-500">
+                            <img src="https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg" class="w-full h-[400px] object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute bottom-0 left-0 p-8 z-20 bg-gradient-to-t from-black/80 to-transparent w-full">
+                                <h3 class="text-2xl font-bold text-white mb-1">Classic Walker</h3>
+                                <p class="text-gray-300 text-sm">Timeless</p>
+                            </div>
+                        </div>
+                        <div class="group relative rounded-2xl overflow-hidden cursor-pointer hover-lift transition-all duration-500">
+                            <img src="https://images.pexels.com/photos/167706/pexels-photo-167706.jpeg" class="w-full h-[400px] object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute bottom-0 left-0 p-8 z-20 bg-gradient-to-t from-black/80 to-transparent w-full">
+                                <h3 class="text-2xl font-bold text-white mb-1">Trail Blazer</h3>
+                                <p class="text-gray-300 text-sm">Rugged</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-products" class="page-content hidden">
+            <div class="container mx-auto px-4 py-20">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6 dark:text-white tracking-tight">Our Collection</h1>
+                    <p class="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">Explore our range of premium footwear designed for every occasion.</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-4 mb-16">
+                    <button class="filter-btn active px-8 py-3 rounded-full border border-blue-600 bg-blue-600 text-white font-semibold shadow-lg shadow-blue-600/20 transition-all duration-300 hover:-translate-y-1 active:scale-95" data-filter="all">All</button>
+                    <button class="filter-btn px-8 py-3 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold hover:border-blue-400 hover:text-blue-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 active:scale-95" data-filter="Running">Running</button>
+                    <button class="filter-btn px-8 py-3 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold hover:border-blue-400 hover:text-blue-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 active:scale-95" data-filter="Casual">Casual</button>
+                    <button class="filter-btn px-8 py-3 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold hover:border-blue-400 hover:text-blue-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 active:scale-95" data-filter="Formal">Formal</button>
+                </div>
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
+            </div>
+        </section>
+
+        <section id="page-about" class="page-content hidden">
+            <div class="bg-white dark:bg-gray-900">
+                <div class="container mx-auto px-4 py-24">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        <div class="relative group">
+                            <div class="absolute -inset-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-[2rem] blur-xl opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+                            <img src="https://images.pexels.com/photos/847371/pexels-photo-847371.jpeg" class="relative rounded-[2rem] shadow-2xl object-cover w-full h-[600px] transform transition duration-500 hover:scale-[1.02]">
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-4"><span class="h-1 w-10 bg-blue-600 rounded-full"></span><span class="text-blue-600 font-bold tracking-wider uppercase text-sm">About SoleMates</span></div>
+                            <h1 class="text-4xl md:text-5xl font-bold mb-8 text-gray-900 dark:text-white leading-tight">Walking the Path of Comfort & Style</h1>
+                            <p class="text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">Founded in 2020 by <strong>Parth</strong>, SoleMates started as a small passion project and grew into a global movement.</p>
+                            <p class="text-lg text-gray-500 dark:text-gray-400 mb-10 leading-relaxed">Our mission is simple: To engineer footwear that empowers your every step. From the stitching to the sole, every detail is crafted with purpose.</p>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-700 flex items-center gap-4"><div class="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full text-blue-600"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div><span class="block text-2xl font-bold text-gray-900 dark:text-white">50k+</span><span class="text-sm text-gray-500 dark:text-gray-400">Happy Customers</span></div></div>
+                                <div class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-700 flex items-center gap-4"><div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-full text-green-600"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div><span class="block text-2xl font-bold text-gray-900 dark:text-white">100%</span><span class="text-sm text-gray-500 dark:text-gray-400">Eco-Friendly</span></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-contact" class="page-content hidden">
+            <div class="container mx-auto px-4 py-24">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl font-bold mb-6 dark:text-white">Get In Touch</h1>
+                    <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">We'd love to hear from you. Visit our flagship store or drop us a message.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 max-w-6xl mx-auto rounded-[2rem] shadow-2xl overflow-hidden md:grid md:grid-cols-2 border border-gray-100 dark:border-gray-700">
+                    <form id="contact-form" class="p-10 sm:p-16 space-y-8">
+                        <div class="space-y-2"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Name</label><input type="text" required class="w-full px-6 py-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white transition-all outline-none"></div>
+                        <div class="space-y-2"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Email</label><input type="email" required class="w-full px-6 py-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white transition-all outline-none"></div>
+                        <div class="space-y-2"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Message</label><textarea rows="4" required class="w-full px-6 py-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white transition-all outline-none resize-none"></textarea></div>
+                        <button type="submit" class="w-full px-8 py-4 bg-blue-600 text-white text-lg font-bold rounded-xl shadow-lg hover:bg-blue-700 hover:-translate-y-1 active:scale-[0.98] transition-all duration-300">Send Message</button>
+                        <div id="form-status" class="text-center h-6 font-medium"></div>
+                    </form>
+                    <div class="bg-gray-900 text-white p-10 sm:p-16 flex flex-col justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-blue-600/20 blur-3xl rounded-full transform -translate-y-1/2 translate-x-1/2"></div>
+                        <h3 class="text-3xl font-bold mb-8 relative z-10">Visit Our Store</h3>
+                        <div class="space-y-8 relative z-10">
+                            <div class="flex items-start space-x-6 group"><div class="bg-gray-800 p-4 rounded-2xl group-hover:bg-blue-600 transition-colors duration-300 shrink-0"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg></div><div><h4 class="font-bold text-gray-200">Phone</h4><p class="text-gray-400 mt-1">+91 98765 43210</p></div></div>
+                            <div class="flex items-start space-x-6 group"><div class="bg-gray-800 p-4 rounded-2xl group-hover:bg-blue-600 transition-colors duration-300 shrink-0"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div><div><h4 class="font-bold text-gray-200">Email</h4><p class="text-gray-400 mt-1">hello@solemates.in</p></div></div>
+                            <div class="flex items-start space-x-6 group"><div class="bg-gray-800 p-4 rounded-2xl group-hover:bg-blue-600 transition-colors duration-300 shrink-0"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div><div><h4 class="font-bold text-gray-200">Flagship Store</h4><p class="text-gray-400 mt-1">101, High Street Phoenix,<br>Lower Parel, Mumbai - 400013</p></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 border-t border-gray-800 pt-16 pb-8">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex justify-center space-x-8 mb-10">
+                <a href="#" class="p-3 bg-gray-800 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 hover:-translate-y-1"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"></path></svg></a>
+                <a href="#" class="p-3 bg-gray-800 rounded-full hover:bg-pink-600 hover:text-white transition-all duration-300 hover:-translate-y-1"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path></svg></a>
+                <a href="#" class="p-3 bg-gray-800 rounded-full hover:bg-sky-500 hover:text-white transition-all duration-300 hover:-translate-y-1"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.586-5.515 5.753 0 .448.05.885.146 1.312-4.576-.229-8.632-2.424-11.358-5.761-.474.814-.746 1.753-.746 2.758 0 1.996.993 3.758 2.512 4.798-.923-.029-1.786-.284-2.543-.696v.071c0 2.789 1.944 5.118 4.542 5.649-.476.13-.984.198-1.505.198-.365 0-.717-.036-1.065-.104.72 2.28 2.803 3.94 5.275 3.985-1.93 1.518-4.357 2.424-6.985 2.424-.454 0-.898-.026-1.334-.079 2.485 1.598 5.462 2.53 8.683 2.53 10.418 0 16.121-8.777 16.121-16.376 0-.249-.005-.497-.017-.743.984-.707 1.838-1.592 2.518-2.608z"></path></svg></a>
+            </div>
+            <p class="font-medium text-gray-500">&copy; <span id="current-year"></span> SoleMates. All Rights Reserved.</p>
+            <p class="text-sm mt-3 text-gray-600">Founded by Parth. Crafted with ❤️ for happy feet.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- INDIAN PRODUCT DATA (Prices in INR) ---
+        const products = [
+            { id: 1, name: "The Urban Runner", category: "Running", price: 2499, img: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg" },
+            { id: 2, name: "Classic Walker", category: "Casual", price: 1999, img: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg" },
+            { id: 3, name: "Trail Blazer", category: "Running", price: 3999, img: "https://images.pexels.com/photos/167706/pexels-photo-167706.jpeg" },
+            { id: 4, name: "Aero Lite", category: "Running", price: 2299, img: "https://images.pexels.com/photos/1032110/pexels-photo-1032110.jpeg" },
+            { id: 5, name: "Sunset Sandal", category: "Casual", price: 999, img: "https://images.pexels.com/photos/267202/pexels-photo-267202.jpeg" },
+            { id: 6, name: "Executive Loafer", category: "Formal", price: 4499, img: "https://images.pexels.com/photos/292999/pexels-photo-292999.jpeg" },
+            { id: 7, name: "City Slicker", category: "Formal", price: 3499, img: "https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg" },
+            { id: 8, name: "Weekend Vibes", category: "Casual", price: 1499, img: "https://images.pexels.com/photos/1240892/pexels-photo-1240892.jpeg" },
+            { id: 9, name: "Night Owl", category: "Running", price: 3299, img: "https://images.pexels.com/photos/1464625/pexels-photo-1464625.jpeg" },
+            { id: 10, name: "Skate High", category: "Casual", price: 2199, img: "https://images.pexels.com/photos/1598508/pexels-photo-1598508.jpeg" },
+            { id: 11, name: "Oxford Prime", category: "Formal", price: 5999, img: "https://images.pexels.com/photos/293405/pexels-photo-293405.jpeg" },
+            { id: 12, name: "Marathon Pro", category: "Running", price: 4299, img: "https://images.pexels.com/photos/2404959/pexels-photo-2404959.jpeg" },
+        ];
+
+        let cart = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load Cart from LocalStorage
+            const savedCart = localStorage.getItem('solemates_cart');
+            if(savedCart) {
+                cart = JSON.parse(savedCart);
+            }
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+            const pageContents = document.querySelectorAll('.page-content');
+            const ctaButtons = document.querySelectorAll('.cta-button');
+            const productGrid = document.getElementById('product-grid');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const cartCountElement = document.getElementById('cart-count');
+            const themeToggle = document.getElementById('theme-toggle');
+            const toast = document.getElementById('toast');
+            
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const cartBackdrop = document.getElementById('cart-backdrop');
+            const cartBtn = document.getElementById('cart-btn');
+            const closeCartBtn = document.getElementById('close-cart');
+            const cartItemsContainer = document.getElementById('cart-items-container');
+            const cartTotalElement = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            // --- PAGE NAVIGATION ---
+            function showPage(pageId) {
+                pageContents.forEach(page => {
+                    if (!page.classList.contains('hidden')) {
+                        page.style.opacity = '0';
+                        setTimeout(() => page.classList.add('hidden'), 200);
+                    }
+                });
+                setTimeout(() => {
+                    const targetPage = document.getElementById(pageId);
+                    if (targetPage) {
+                        targetPage.classList.remove('hidden');
+                        void targetPage.offsetWidth; 
+                        targetPage.style.opacity = '1';
+                    }
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 200);
+                const pageName = pageId.replace('page-', '');
+                navLinks.forEach(link => link.classList.remove('active', 'text-blue-600'));
+                document.querySelectorAll(`.nav-link[data-page="${pageName}"]`).forEach(link => link.classList.add('active'));
+            }
+
+            // --- RENDER PRODUCTS ---
+            function renderProducts(filter = 'all') {
+                productGrid.innerHTML = ''; 
+                const filteredProducts = filter === 'all' ? products : products.filter(p => p.category === filter);
+
+                filteredProducts.forEach((product, index) => {
+                    const card = document.createElement('div');
+                    const delay = index * 50; 
+                    card.className = "bg-white dark:bg-gray-800 rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden transform transition-all duration-500 hover:-translate-y-2 flex flex-col border border-gray-100 dark:border-gray-700 opacity-0 animate-scale-in group";
+                    card.style.animationDelay = `${delay}ms`;
+                    card.innerHTML = `
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="${product.img}" alt="${product.name}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
+                            <div class="absolute top-4 right-4 bg-white/90 dark:bg-black/80 backdrop-blur-md text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">${product.category}</div>
+                            <button class="quick-view-btn absolute bottom-4 right-4 p-3 bg-white text-gray-800 rounded-full shadow-lg opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-blue-600 hover:text-white" data-id="${product.id}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </button>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-xl font-bold mb-2 dark:text-white">${product.name}</h3>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">Premium comfort.</p>
+                            </div>
+                            <div class="flex justify-between items-center mt-auto">
+                                <span class="text-2xl font-bold text-gray-900 dark:text-white">₹${product.price.toLocaleString('en-IN')}</span>
+                                <button class="add-to-cart-btn p-3 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-blue-600/40 active:scale-90 transition-all duration-300" data-id="${product.id}" data-name="${product.name}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    productGrid.appendChild(card);
+                });
+                attachListeners();
+            }
+
+            // --- CART & STORAGE LOGIC ---
+            function saveCart() {
+                localStorage.setItem('solemates_cart', JSON.stringify(cart));
+            }
+
+            function toggleCart() {
+                const isHidden = cartSidebar.classList.contains('translate-x-full');
+                if (isHidden) {
+                    cartSidebar.classList.remove('translate-x-full');
+                    cartBackdrop.classList.remove('hidden');
+                    setTimeout(() => cartBackdrop.classList.remove('opacity-0'), 10);
+                } else {
+                    cartSidebar.classList.add('translate-x-full');
+                    cartBackdrop.classList.add('opacity-0');
+                    setTimeout(() => cartBackdrop.classList.add('hidden'), 500);
+                }
+            }
+
+            function addToCart(id) {
+                const product = products.find(p => p.id === parseInt(id));
+                cart.push(product);
+                saveCart();
+                updateCartUI();
+                showToast(`Added ${product.name} to cart!`);
+                if (cartSidebar.classList.contains('translate-x-full')) toggleCart();
+            }
+
+            function removeFromCart(index, elementId) {
+                const itemElement = document.getElementById(elementId);
+                itemElement.classList.add('animate-slide-out-right');
+                setTimeout(() => {
+                    cart.splice(index, 1);
+                    saveCart();
+                    updateCartUI();
+                }, 400);
+            }
+
+            function updateCartUI() {
+                cartCountElement.textContent = cart.length;
+                cartCountElement.classList.remove('scale-0');
+                cartCountElement.classList.add('scale-125');
+                setTimeout(() => cartCountElement.classList.remove('scale-125'), 200);
+
+                cartItemsContainer.innerHTML = '';
+                let total = 0;
+
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = `<div class="text-center text-gray-400 mt-20 flex flex-col items-center animate-fade-in"><div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-full mb-4"><svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg></div><p class="text-lg font-medium">Your cart is empty</p><button class="text-blue-600 font-bold hover:underline mt-4" id="start-shopping-btn">Start Shopping</button></div>`;
+                    document.getElementById('start-shopping-btn')?.addEventListener('click', () => { toggleCart(); showPage('page-products'); });
+                } else {
+                    cart.forEach((item, index) => {
+                        total += item.price;
+                        const uniqueId = `cart-item-${Date.now()}-${index}`;
+                        const itemEl = document.createElement('div');
+                        itemEl.id = uniqueId;
+                        itemEl.className = "flex items-center space-x-4 bg-white dark:bg-gray-700/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 animate-slide-up";
+                        itemEl.style.animationDelay = `${index * 50}ms`;
+                        itemEl.innerHTML = `<img src="${item.img}" class="w-20 h-20 object-cover rounded-xl shadow-sm"><div class="flex-1"><h4 class="font-bold dark:text-white text-base">${item.name}</h4><p class="text-blue-600 dark:text-blue-400 font-bold mt-1">₹${item.price.toLocaleString('en-IN')}</p></div><button class="group p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors remove-item-btn" data-index="${index}" data-dom-id="${uniqueId}"><svg class="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>`;
+                        cartItemsContainer.appendChild(itemEl);
+                    });
+                }
+                cartTotalElement.textContent = '₹' + total.toLocaleString('en-IN');
+                document.querySelectorAll('.remove-item-btn').forEach(btn => {
+                    btn.addEventListener('click', function() { removeFromCart(this.getAttribute('data-index'), this.getAttribute('data-dom-id')); });
+                });
+            }
+
+            // --- QUICK VIEW MODAL LOGIC ---
+            function openModal(id) {
+                const product = products.find(p => p.id === parseInt(id));
+                document.getElementById('qv-img').src = product.img;
+                document.getElementById('qv-category').textContent = product.category;
+                document.getElementById('qv-title').textContent = product.name;
+                document.getElementById('qv-price').textContent = '₹' + product.price.toLocaleString('en-IN');
+                
+                const addBtn = document.getElementById('qv-add-btn');
+                addBtn.onclick = function() {
+                    addToCart(product.id);
+                    closeModal();
+                };
+
+                const modal = document.getElementById('quick-view-backdrop');
+                const modalContent = document.getElementById('quick-view-modal');
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modalContent.classList.remove('scale-90', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+
+            function closeModal() {
+                const modal = document.getElementById('quick-view-backdrop');
+                const modalContent = document.getElementById('quick-view-modal');
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-90', 'opacity-0');
+                modal.classList.add('opacity-0');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+
+            // --- MOBILE MENU ---
+            function toggleMobileMenu() {
+                const isHidden = mobileMenu.classList.contains('-translate-y-full');
+                if (isHidden) {
+                    mobileMenu.classList.remove('-translate-y-full');
+                } else {
+                    mobileMenu.classList.add('-translate-y-full');
+                }
+            }
+
+            // --- LISTENERS ---
+            function attachListeners() {
+                document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        this.style.transform = 'scale(0.9)';
+                        setTimeout(() => this.style.transform = 'scale(1)', 150);
+                        addToCart(id);
+                    });
+                });
+                document.querySelectorAll('.quick-view-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        openModal(this.getAttribute('data-id'));
+                    });
+                });
+            }
+
+            // AMAZON INDIA REDIRECT
+            checkoutBtn.addEventListener('click', function() {
+                if(cart.length > 0) {
+                    const firstItemName = cart[0].name;
+                    window.open(`https://www.amazon.in/s?k=${encodeURIComponent(firstItemName + " shoes")}`, '_blank');
+                } else {
+                    showToast("Your cart is empty!");
+                }
+            });
+
+            function showToast(message) {
+                const toastMsg = document.getElementById('toast-message');
+                toastMsg.textContent = message;
+                toast.classList.remove('translate-y-24', 'opacity-0'); 
+                setTimeout(() => { toast.classList.add('translate-y-24', 'opacity-0'); }, 3000);
+            }
+
+            function toggleTheme() {
+                document.documentElement.classList.toggle('dark');
+                const isDark = document.documentElement.classList.contains('dark');
+                const sunIcon = document.getElementById('sun-icon');
+                const moonIcon = document.getElementById('moon-icon');
+                const btn = document.getElementById('theme-toggle');
+                btn.style.transform = 'rotate(180deg)';
+                setTimeout(() => btn.style.transform = 'rotate(0deg)', 300);
+                if (isDark) { sunIcon.classList.remove('hidden'); moonIcon.classList.add('hidden'); } 
+                else { sunIcon.classList.add('hidden'); moonIcon.classList.remove('hidden'); }
+            }
+
+            // Scroll to Top
+            window.addEventListener('scroll', () => {
+                const btn = document.getElementById('scroll-top');
+                if (window.scrollY > 300) {
+                    btn.classList.remove('translate-y-20', 'opacity-0');
+                } else {
+                    btn.classList.add('translate-y-20', 'opacity-0');
+                }
+            });
+            document.getElementById('scroll-top').addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // General Events
+            navLinks.forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showPage('page-' + e.currentTarget.getAttribute('data-page')); if (!cartSidebar.classList.contains('translate-x-full')) toggleCart(); }));
+            mobileNavLinks.forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showPage('page-' + e.currentTarget.getAttribute('data-page')); toggleMobileMenu(); }));
+            ctaButtons.forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); showPage('page-' + e.currentTarget.getAttribute('data-page')); }));
+            filterButtons.forEach(btn => btn.addEventListener('click', function() { filterButtons.forEach(b => { b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600'); b.classList.add('bg-white', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-300', 'border-gray-200', 'dark:border-gray-700'); }); this.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-300', 'border-gray-200', 'dark:border-gray-700'); this.classList.add('bg-blue-600', 'text-white', 'border-blue-600'); renderProducts(this.getAttribute('data-filter')); }));
+            
+            themeToggle.addEventListener('click', toggleTheme);
+            cartBtn.addEventListener('click', toggleCart);
+            closeCartBtn.addEventListener('click', toggleCart);
+            cartBackdrop.addEventListener('click', toggleCart);
+            mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+            
+            document.getElementById('close-modal').addEventListener('click', closeModal);
+            document.getElementById('quick-view-backdrop').addEventListener('click', (e) => { if(e.target === document.getElementById('quick-view-backdrop')) closeModal(); });
+
+            if (document.getElementById('contact-form')) {
+                document.getElementById('contact-form').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    document.getElementById('form-status').innerHTML = '<span class="text-green-600 font-bold animate-pulse">Message sent successfully!</span>';
+                    this.reset();
+                    setTimeout(() => document.getElementById('form-status').innerHTML = '', 3000);
+                });
+            }
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            
+            // Init
+            updateCartUI();
+            renderProducts(); 
+        });
+    </script>
+</body>
+</html>
